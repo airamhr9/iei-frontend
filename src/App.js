@@ -1,11 +1,12 @@
-import AppBar from "./components/AppBar";
-import Form from "./components/Form";
+import { BrowserRouter as Router } from "react-router-dom";
+import Root from "./components/Root";
 
 function App() {
   return (
     <div className="App">
-      <AppBar />
-      <Form />
+      <Router>
+        <Root />
+      </Router>
     </div>
   );
 }
