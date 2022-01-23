@@ -7,6 +7,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
+import BiblioData from "./BiblioData";
 
 const tiposBiblioteca = ["Pública", "Privada"];
 
@@ -104,10 +105,31 @@ export default function Form() {
           </Box>
         </Grid>
       </Grid>
+      
       <Box mt={5}>
-        <Typography variant="h5" color="#424242">
+      <Grid container spacing={1}> 
+        <Grid item xs={0} md={3}/>
+        <Grid item xs={12} md={6}>
+        
+        <Typography variant="h5" color="#424242" sx={{ mb: 1.5 }}>
           Resultados de la búsqueda
         </Typography>
+      
+          <BiblioData 
+           nombre="Nombre de la biblioteca"
+           tipo = "Publica"
+           localidad = "Localidad"
+           provincia = "Provincia"
+           direccion = "Calle Bla bla Nº143"
+           cp = "46020"
+           telefono = "123456789"
+           email = "correo@mail.com"
+           descripcion="Una descripcion muy larga para ir probando a ver que tal funciona" />
+        </Grid>
+        <Grid item xs={0} md={3}/>
+      </Grid>
+        
+
       </Box>
     </Box>
   );
