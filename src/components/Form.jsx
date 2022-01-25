@@ -20,6 +20,22 @@ export default function Form() {
     tipoBiblioteca: tipoBiblioteca,
   });
 
+
+  //Construye las tarjetas de biblioteca
+ /*  const biblioList = res.map(biblio =>{
+
+    return <biblioList
+       nombre={biblio.nombre}
+           tipo = {biblio.tipo}
+           localidad = {biblio.localidad}
+           provincia = {biblio.provincia}
+           direccion = {biblio.direccion}
+           cp = {biblio.codPostal}
+           telefono = {biblio.telefono}
+           email = {biblio.email}
+           descripcion={biblio.descripcion} />    
+  }) */
+
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setEstadoFormulario((prevState) => ({
@@ -114,7 +130,9 @@ export default function Form() {
         <Typography variant="h5" color="#424242" sx={{ mb: 1.5 }}>
           Resultados de la búsqueda
         </Typography>
-      
+        
+              {/* Cambiar llamar a esta biblioteca de prueba por la llamada a Bibliolist */}
+              
           <BiblioData 
            nombre="Nombre de la biblioteca"
            tipo = "Publica"

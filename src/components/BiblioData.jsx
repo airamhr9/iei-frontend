@@ -30,23 +30,16 @@ return (
             <Grid item xs={3}>
              {props.localidad} ({props.provincia}) CP: {props.cp}
               <br />
-              {props.direccion} 
-            
+              {props.direccion}             
             </Grid>
             <Grid item xs={5}>
           Tlf: {props.telefono}
               <br/>
-              Email: {props.email}
-             
+              Email: {props.email}             
         </Grid>
-        </Grid>
-           
-            </Typography>
-            
-          </CardContent>
-         {/*  <CardActions>
-            <Button size="small">Learn More</Button>
-          </CardActions> */}
+        </Grid>           
+            </Typography>            
+          </CardContent>        
         </Card>
       );
 }
