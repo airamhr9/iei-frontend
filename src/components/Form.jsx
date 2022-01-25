@@ -1,3 +1,4 @@
+import { DateRange } from "@mui/icons-material";
 import {
   Box,
   TextField,
@@ -13,6 +14,7 @@ const tiposBiblioteca = ["Pública", "Privada"];
 
 export default function Form() {
   const [tipoBiblioteca, setTipoBiblioteca] = useState("Pública");
+  const [hasSearched, setHasSearched] = useState(false);
   const [estadoFormulario, setEstadoFormulario] = useState({
     localidad: "",
     codPostal: "",
@@ -20,9 +22,86 @@ export default function Form() {
     tipoBiblioteca: tipoBiblioteca,
   });
 
+  const [searchResultCards, setSearchResultsCards] = useState([]);
+
+  const loadSources = () => {
+    fetch("http://localhost:8080/load?sources=eus&cat&cv", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  };
+
+  const getSearchResults = () => {
+    let searchParams = "";
+    if (estadoFormulario.tipoBiblioteca === "Pública") {
+      searchParams += "?tipo=Publica";
+    } else {
+      searchParams += "?tipo=Privada";
+    }
+    if (estadoFormulario.localidad !== "") {
+      searchParams += `&localidad=${estadoFormulario.localidad}`;
+    }
+    if (estadoFormulario.codPostal !== "") {
+      searchParams += `&codigoPostal=${estadoFormulario.codPostal}`;
+    }
+    if (estadoFormulario.provincia !== "") {
+      searchParams += `&provincia=${estadoFormulario.provincia}`;
+    }
+
+    console.log("http://localhost:8080/search" + searchParams);
+
+    fetch("http://localhost:8080/search" + searchParams, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        buildSearchResults(data);
+      });
+  };
+
+  const buildSearchResults = (data) => {
+    console.log(data);
+    let resultCards = [];
+    for (let i = 0; i < data.length; i++) {
+      resultCards.push(
+        <Grid item container xs={12} key={i}>
+          <Grid item xs={0} md={3}>
+            <div />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <div />
+            <BiblioData
+              nombre={data[i].nombre}
+              tipo={data[i].tipo}
+              localidad={data[i].enLocalidad.nombre}
+              provincia={data[i].enLocalidad.enProvincia.nombre}
+              direccion={data[i].direccion}
+              cp={data[i].codigoPostal}
+              telefono={data[i].telefono}
+              email={data[i].email}
+              descripcion={data[i].descripcion}
+            />
+          </Grid>
+          <Grid item xs={0} md={3}>
+            <div />
+          </Grid>
+        </Grid>
+      );
+    }
+
+    setHasSearched(true);
+    setSearchResultsCards(resultCards);
+  };
 
   //Construye las tarjetas de biblioteca
- /*  const biblioList = res.map(biblio =>{
+  /*  const biblioList = res.map(biblio =>{
 
     return <biblioList
        nombre={biblio.nombre}
@@ -105,12 +184,12 @@ export default function Form() {
             </TextField>
           </Grid>
           <Grid item xs={6}>
-            <Button fullWidth variant="contained">
+            <Button fullWidth variant="contained" onClick={getSearchResults}>
               Buscar
             </Button>
           </Grid>
           <Grid item xs={6}>
-            <Button fullWidth variant="outlined">
+            <Button fullWidth variant="outlined" onClick={loadSources}>
               Cancelar
             </Button>
           </Grid>
@@ -121,33 +200,18 @@ export default function Form() {
           </Box>
         </Grid>
       </Grid>
-      
       <Box mt={5}>
-      <Grid container spacing={1}> 
-        <Grid item xs={0} md={3}/>
-        <Grid item xs={12} md={6}>
-        
-        <Typography variant="h5" color="#424242" sx={{ mb: 1.5 }}>
-          Resultados de la búsqueda
-        </Typography>
-        
-              {/* Cambiar llamar a esta biblioteca de prueba por la llamada a Bibliolist */}
-              
-          <BiblioData 
-           nombre="Nombre de la biblioteca"
-           tipo = "Publica"
-           localidad = "Localidad"
-           provincia = "Provincia"
-           direccion = "Calle Bla bla Nº143"
-           cp = "46020"
-           telefono = "123456789"
-           email = "correo@mail.com"
-           descripcion="Una descripcion muy larga para ir probando a ver que tal funciona" />
+        <Grid container spacing={1}>
+          {hasSearched ? (
+            searchResultCards.length > 0 ? (
+              searchResultCards
+            ) : (
+              <Typography>No se han encontrado resultados</Typography>
+            )
+          ) : (
+            <div></div>
+          )}
         </Grid>
-        <Grid item xs={0} md={3}/>
-      </Grid>
-        
-
       </Box>
     </Box>
   );
