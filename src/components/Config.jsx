@@ -1,21 +1,29 @@
-import {
-  Box,
-  Checkbox,
-  Grid,
-  FormControlLabel,
-  Button,
-  Typography,
-} from "@mui/material";
+import { Box, Checkbox, Grid, FormControlLabel, Button } from "@mui/material";
 import { useEffect, useState } from "react";
 
 export default function Config() {
-  const [selectAll, setSelectAll] = useState(true);
-
   const [fuentesDeDatos, setFuentesDeDatos] = useState({
-    valencia: true,
-    euskadi: true,
-    catalunya: true,
+    valencia: false,
+    euskadi: false,
+    catalunya: false,
   });
+
+  useEffect(() => {
+    fetch("http://localhost:8080/load", {
+      method: "GET",
+    })
+      .then((response) => {
+        console.log(response);
+        return response.json();
+      })
+      .then((data) => {
+        setFuentesDeDatos({
+          valencia: data.includes("ComunitatValenciana"),
+          euskadi: data.includes("Euskadi"),
+          catalunya: data.includes("Catalunya"),
+        });
+      });
+  }, []);
 
   const handleChange = (e) => {
     const { name, checked } = e.target;
@@ -40,87 +48,95 @@ export default function Config() {
         catalunya: false,
       });
     }
-    setSelectAll(checked);
   };
 
-  useEffect(() => {
-    console.log(fuentesDeDatos);
-  }, [fuentesDeDatos]);
+  const loadSelected = () => {
+    let fuentes = "";
+    if (fuentesDeDatos.valencia) {
+      fuentes += "cv-";
+    }
+    if (fuentesDeDatos.catalunya) {
+      fuentes += "cat-";
+    }
+    if (fuentesDeDatos.euskadi) {
+      fuentes += "eus-";
+    }
+    fuentes = fuentes.substring(0, fuentes.length - 1);
+    console.log(fuentes);
+    fetch("http://localhost:8080/load?sources=" + fuentes, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  };
 
   return (
     <Box component="form" m={5}>
-      <Grid container spacing={2}>
-        <Grid container item xs={6} spacing={2}>
-          <Grid item xs={12}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={selectAll}
-                  onChange={handleChangeSelectAll}
-                  name="selectAll"
-                />
-              }
-              label="Seleccionar todos"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={fuentesDeDatos.valencia}
-                  onChange={handleChange}
-                  name="valencia"
-                />
-              }
-              label="Comunitat Valenciana"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={fuentesDeDatos.euskadi}
-                  onChange={handleChange}
-                  name="euskadi"
-                />
-              }
-              label="Euskadi"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={fuentesDeDatos.catalunya}
-                  onChange={handleChange}
-                  name="catalunya"
-                />
-              }
-              label="Catalunya"
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <Button fullWidth variant="contained">
-              Cargar
-            </Button>
-          </Grid>
-          <Grid item xs={6}>
-            <Button fullWidth variant="outlined">
-              Cancelar
-            </Button>
-          </Grid>
+      <Grid container item xs={4} spacing={2}>
+        <Grid item xs={12}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={
+                  fuentesDeDatos.valencia &&
+                  fuentesDeDatos.catalunya &&
+                  fuentesDeDatos.euskadi
+                }
+                onChange={handleChangeSelectAll}
+                name="selectAll"
+              />
+            }
+            label="Seleccionar todos"
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={fuentesDeDatos.valencia}
+                onChange={handleChange}
+                name="valencia"
+              />
+            }
+            label="Comunitat Valenciana"
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={fuentesDeDatos.euskadi}
+                onChange={handleChange}
+                name="euskadi"
+              />
+            }
+            label="Euskadi"
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={fuentesDeDatos.catalunya}
+                onChange={handleChange}
+                name="catalunya"
+              />
+            }
+            label="Catalunya"
+          />
         </Grid>
         <Grid item xs={6}>
-          <Box height="350px" bgcolor="black">
-            <Typography color="white">map</Typography>
-          </Box>
+          <Button fullWidth variant="contained" onClick={loadSelected}>
+            Cargar
+          </Button>
+        </Grid>
+        <Grid item xs={6}>
+          <Button fullWidth variant="outlined">
+            Cancelar
+          </Button>
         </Grid>
       </Grid>
-      <Box mt={5}>
-        <Typography variant="h5" color="#424242">
-          Resultados de la búsqueda
-        </Typography>
-      </Box>
     </Box>
   );
 }

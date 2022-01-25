@@ -1,4 +1,3 @@
-import { DateRange } from "@mui/icons-material";
 import {
   Box,
   TextField,
@@ -9,6 +8,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import BiblioData from "./BiblioData";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 
 const tiposBiblioteca = ["Pública", "Privada"];
 
@@ -22,11 +22,16 @@ export default function Form() {
     tipoBiblioteca: tipoBiblioteca,
   });
 
+  const [mapState, setMapState] = useState({
+    center: [41.3879, 2.16992],
+    markers: [],
+  });
+
   const [searchResultCards, setSearchResultsCards] = useState([]);
 
   const loadSources = () => {
-    fetch("http://localhost:8080/load?sources=eus&cat&cv", {
-      method: "GET",
+    fetch("http://localhost:8080/load?sources=cat-eus-cv", {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
@@ -50,8 +55,6 @@ export default function Form() {
       searchParams += `&provincia=${estadoFormulario.provincia}`;
     }
 
-    console.log("http://localhost:8080/search" + searchParams);
-
     fetch("http://localhost:8080/search" + searchParams, {
       method: "GET",
       headers: {
@@ -69,6 +72,7 @@ export default function Form() {
   const buildSearchResults = (data) => {
     console.log(data);
     let resultCards = [];
+    let markerCoords = [];
     for (let i = 0; i < data.length; i++) {
       resultCards.push(
         <Grid item container xs={12} key={i}>
@@ -94,10 +98,26 @@ export default function Form() {
           </Grid>
         </Grid>
       );
+      markerCoords.push(
+        <Marker position={[data[i].latitud, data[i].longitud]}>
+          <Popup>{data[i].nombre}</Popup>
+        </Marker>
+      );
     }
 
     setHasSearched(true);
     setSearchResultsCards(resultCards);
+    if (resultCards.length > 0) {
+      setMapState({
+        center: [data[0].latitud, data[0].longitud],
+        markers: markerCoords,
+      });
+    } else {
+      setMapState((prevState) => ({
+        ...prevState,
+        markers: [],
+      }));
+    }
   };
 
   //Construye las tarjetas de biblioteca
@@ -195,9 +215,19 @@ export default function Form() {
           </Grid>
         </Grid>
         <Grid item xs={6}>
-          <Box height="350px" bgcolor="black">
-            <Typography color="white">map</Typography>
-          </Box>
+          <div id="map">
+            <MapContainer
+              center={mapState.center}
+              zoom={13}
+              scrollWheelZoom={true}
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              {mapState.markers}
+            </MapContainer>
+          </div>
         </Grid>
       </Grid>
       <Box mt={5}>
