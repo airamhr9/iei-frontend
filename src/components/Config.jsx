@@ -1,7 +1,29 @@
-import { Box, Checkbox, Grid, FormControlLabel, Button } from "@mui/material";
+import {
+  Box,
+  Checkbox,
+  Grid,
+  FormControlLabel,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  CircularProgress,
+  DialogTitle,
+  DialogContentText,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 
 export default function Config() {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [sourcesLoaded, setSourcesLoaded] = useState(false);
+
+  const handleClose = (event, reason) => {
+    if (reason && reason === "backdropClick" && !sourcesLoaded) {
+      return;
+    }
+    setDialogOpen(false);
+  };
+
   const [fuentesDeDatos, setFuentesDeDatos] = useState({
     valencia: false,
     euskadi: false,
@@ -51,6 +73,8 @@ export default function Config() {
   };
 
   const loadSelected = () => {
+    setSourcesLoaded(false);
+    setDialogOpen(true);
     let fuentes = "";
     if (fuentesDeDatos.valencia) {
       fuentes += "cv-";
@@ -68,6 +92,8 @@ export default function Config() {
       headers: {
         "Content-Type": "application/json",
       },
+    }).then(() => {
+      setSourcesLoaded(true);
     });
   };
 
@@ -137,6 +163,34 @@ export default function Config() {
           </Button>
         </Grid>
       </Grid>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Cargando fuentes de datos"}
+        </DialogTitle>
+        <DialogContent>
+          <Box
+            sx={{
+              textAlign: "center",
+            }}
+          >
+            {!sourcesLoaded ? (
+              <CircularProgress />
+            ) : (
+              <DialogContentText>Se ha completado la carga</DialogContentText>
+            )}
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} disabled={!sourcesLoaded}>
+            Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

@@ -9,6 +9,7 @@ import {
 import { useEffect, useState } from "react";
 import BiblioData from "./BiblioData";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import * as React from "react";
 
 const tiposBiblioteca = ["Pública", "Privada"];
 
