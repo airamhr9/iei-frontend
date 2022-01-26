@@ -23,6 +23,15 @@ export default function Form() {
     tipoBiblioteca: tipoBiblioteca,
   });
 
+  const cleanForm = () => {
+    setEstadoFormulario({
+      localidad: "",
+      codPostal: "",
+      provincia: "",
+      tipoBiblioteca: tipoBiblioteca,
+    });
+  };
+
   const [mapState, setMapState] = useState({
     center: [41.3879, 2.16992],
     markers: [],
@@ -149,10 +158,6 @@ export default function Form() {
     handleFormChange(event);
   };
 
-  useEffect(() => {
-    console.log(estadoFormulario);
-  }, [estadoFormulario]);
-
   return (
     <Box component="form" m={5}>
       <Grid container spacing={2}>
@@ -210,7 +215,7 @@ export default function Form() {
             </Button>
           </Grid>
           <Grid item xs={6}>
-            <Button fullWidth variant="outlined" onClick={loadSources}>
+            <Button fullWidth variant="outlined" onClick={cleanForm}>
               Cancelar
             </Button>
           </Grid>
