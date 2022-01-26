@@ -11,10 +11,10 @@ import BiblioData from "./BiblioData";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import * as React from "react";
 
-const tiposBiblioteca = ["Pública", "Privada"];
+const tiposBiblioteca = ["Pública", "Privada", "Todas"];
 
 export default function Form() {
-  const [tipoBiblioteca, setTipoBiblioteca] = useState("Pública");
+  const [tipoBiblioteca, setTipoBiblioteca] = useState("Todas");
   const [hasSearched, setHasSearched] = useState(false);
   const [estadoFormulario, setEstadoFormulario] = useState({
     localidad: "",
@@ -49,11 +49,11 @@ export default function Form() {
   };
 
   const getSearchResults = () => {
-    let searchParams = "";
+    let searchParams = "?";
     if (estadoFormulario.tipoBiblioteca === "Pública") {
-      searchParams += "?tipo=Publica";
-    } else {
-      searchParams += "?tipo=Privada";
+      searchParams += "tipo=Publica";
+    } else if (estadoFormulario.tipoBiblioteca === "Privada") {
+      searchParams += "tipo=Privada";
     }
     if (estadoFormulario.localidad !== "") {
       searchParams += `&localidad=${estadoFormulario.localidad}`;
@@ -164,7 +164,6 @@ export default function Form() {
         <Grid container item xs={6} spacing={2}>
           <Grid item xs={12}>
             <TextField
-              required
               fullWidth
               name="localidad"
               label="Localidad"
@@ -175,9 +174,8 @@ export default function Form() {
           <Grid item xs={12}>
             <TextField
               fullWidth
-              required
               name="codPostal"
-              label="Código Postal"
+              label="Código postal"
               onChange={handleFormChange}
               value={estadoFormulario.codPostal}
             />
@@ -185,7 +183,6 @@ export default function Form() {
           <Grid item xs={12}>
             <TextField
               fullWidth
-              required
               name="provincia"
               label="Provincia"
               onChange={handleFormChange}
